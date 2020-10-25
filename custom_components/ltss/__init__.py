@@ -31,6 +31,8 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entityfilter import generate_filter
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
+from homeassistant.helpers.json import JSONEncoder
+import json
 
 from sqlalchemy import text
 
@@ -286,7 +288,8 @@ class LTSS_DB(threading.Thread):
         if self.engine is not None:
             self.engine.dispose()
 
-        self.engine = create_engine(self.db_url, echo=False)
+        self.engine = create_engine(self.db_url, echo=False,
+                json_serializer=lambda obj: json.dumps(obj, cls=JSONEncoder))
 
         # Make sure TimescaleDB  and PostGIS extensions are loaded
         with self.engine.connect() as con:
